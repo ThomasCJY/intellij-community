@@ -293,9 +293,13 @@ public class CoreApplicationEnvironment {
   }
 
   public static <T> void registerExtensionPoint(@NotNull ExtensionsArea area, @NotNull String name, @NotNull Class<? extends T> aClass) {
-    if (!area.hasExtensionPoint(name)) {
-      ExtensionPoint.Kind kind = aClass.isInterface() || Modifier.isAbstract(aClass.getModifiers()) ? ExtensionPoint.Kind.INTERFACE : ExtensionPoint.Kind.BEAN_CLASS;
-      area.registerExtensionPoint(name, aClass.getName(), kind);
+    synchronized (area) {
+      if (!area.hasExtensionPoint(name)) {
+        ExtensionPoint.Kind kind = aClass.isInterface() || Modifier.isAbstract(aClass.getModifiers())
+                                   ? ExtensionPoint.Kind.INTERFACE
+                                   : ExtensionPoint.Kind.BEAN_CLASS;
+        area.registerExtensionPoint(name, aClass.getName(), kind);
+      }
     }
   }
 
